@@ -1,121 +1,100 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import axios from 'axios';
+import Navbar from './components/Navbar';
+import { Editor } from '@monaco-editor/react';
+import spinner from "./assets/spinner.svg";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [userCode, setUserCode] = useState("");
+  const [userLang, setUserLang] = useState("javascript");
+  const [userTheme, setUserTheme] = useState("vs-dark");
+  const [fontSize, setFontSize] = useState(20);
+
+  // User input and output
+  const [userInput, setUserInput] = useState("");
+  const [userOutput, setUserOutput] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const options = {
+    fontSize: fontSize
+  }
+
+  function compile() {
+    setLoading(true);
+    if (userCode === "") {
+      return
+    }
+
+    // Post request to compile endpoint
+    axios.post(`http://localhost:8000/compile`, {
+      code: userCode,
+      language: userLang,
+      input: userInput
+    }).then((res) => {
+      setUserOutput(res.data.stdout || res.data.stderr);
+    }).then(() => {
+      setLoading(false);
+    }).catch((err) => {
+      console.error(err);
+      setUserOutput("Error: " + (err.response ? err.response.data.error : err.message));
+      setLoading(false);
+    });
+  }
+
+  function clearOutput() {
+    setUserOutput("");
+  }
+
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="App">
+      <Navbar
+        userLang={userLang} setUserLang={setUserLang}
+        userTheme={userTheme} setUserTheme={setUserTheme}
+        fontSize={fontSize} setFontSize={setFontSize}
+      />
+      <div className="main">
+        <div className="left-container">
+          <Editor
+            options={options}
+            height="calc(60vh - 50px)"
+            width="100%"
+            theme={userTheme}
+            language={userLang}
+            defaultLanguage="javascript"
+            defaultValue="// Start coding"
+            onChange={(value) => { setUserCode(value as string) }}
+          />
+          <button className="run-btn" onClick={() => compile()}>
+            Run
+          </button>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+        <div className="right-container">
+          <h4>Input:</h4>
+          <div className="input-box">
+            <textarea id="code-inp" onChange=
+              {(e) => setUserInput(e.target.value)}>
+            </textarea>
+          </div>
+          <h4>Output:</h4>
+          {loading ? (
+            <div className="spinner-box">
+              <img src={spinner} alt="Loading..." />
+            </div>
+          ) : (
+            <div className="output-box">
+              <pre>{userOutput}</pre>
+              <button onClick={() => { clearOutput() }}
+                className="clear-btn">
+                Clear
+              </button>
+            </div>
+          )}
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      </div>
+    </div>
   )
 }
 
