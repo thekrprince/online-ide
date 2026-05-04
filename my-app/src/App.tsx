@@ -28,7 +28,7 @@ function App() {
     }
 
     // Post request to compile endpoint
-    axios.post(`http://localhost:8000/compile`, {
+    axios.post(`http://localhost:9000/compile`, {
       code: userCode,
       language: userLang,
       input: userInput

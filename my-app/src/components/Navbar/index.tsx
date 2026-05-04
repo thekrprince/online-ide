@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
+import "./navbar.css";
 
 interface NavbarProps {
     userLang: string,
@@ -13,6 +14,7 @@ const Navbar = ({
     userLang, setUserLang, userTheme,
     setUserTheme, fontSize, setFontSize }: NavbarProps) => {
     const languages = [
+        { value: "javascript", label: "javascript" },
         { value: "c", label: "C" },
         { value: "cpp", label: "C++" },
         { value: "python", label: "Python" },
