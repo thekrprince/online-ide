@@ -33,7 +33,8 @@ function App() {
       language: userLang,
       input: userInput
     }).then((res) => {
-      setUserOutput(res.data.stdout || res.data.stderr);
+      console.log(res);
+      setUserOutput(res.data || res.data.error);
     }).then(() => {
       setLoading(false);
     }).catch((err) => {
@@ -46,7 +47,6 @@ function App() {
   function clearOutput() {
     setUserOutput("");
   }
-
 
   return (
     <div className="App">

@@ -17,8 +17,8 @@ app.post("/compile", (req, res) => {
     console.log("input:", input);
 
     let languageMap = {
-        "javascript": { language: "javascript", version: "es15" },
-        "c": { language: "c", version: "10.2.0" },
+        "javascript": { language: "javascript", id: "97" },
+        "c": { language: "c", id: "75" },
         "cpp": { language: "c++", version: "10.2.0" },
         "python": { language: "python", version: "3.10.0" },
         "java": { language: "java", version: "15.0.2" },
@@ -29,20 +29,14 @@ app.post("/compile", (req, res) => {
     }
 
     let data = {
-        "language": languageMap[language].language,
-        "version": languageMap[language].version,
-        "files": [
-            {
-                "name": "main",
-                "content": code
-            }
-        ],
+        "language_id": languageMap[language].id,
+        "source_code": code,
         "stdin": input
     };
 
     let config = {
         method: 'post',
-        url: 'https://emkc.org/api/v2/piston/execute',
+        url: 'https://ce.judge0.com/submissions?wait=true',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -50,10 +44,10 @@ app.post("/compile", (req, res) => {
     };
 
     Axios(config).then((response) => {
-        res.json(response.data.run);
+        res.json(response.data.stdout);
         console.log(response.data);
-    }).catch(err => {
-        console.log(error);
+    }).catch((err) => {
+        console.log(err);
         res.status(500).send({ error: "Something went wrong" });
     });
 
