@@ -19,9 +19,9 @@ app.post("/compile", (req, res) => {
     let languageMap = {
         "javascript": { language: "javascript", id: "97" },
         "c": { language: "c", id: "75" },
-        "cpp": { language: "c++", version: "10.2.0" },
-        "python": { language: "python", version: "3.10.0" },
-        "java": { language: "java", version: "15.0.2" },
+        "cpp": { language: "c++", id: "15" },
+        "python": { language: "python", id: "34" },
+        "java": { language: "java", id: "26" },
     };
 
     if (!languageMap[language]) {
